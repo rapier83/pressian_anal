@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from bs4 import BeautifulSoup
+from konlpy.tag import Hannanum
 import urllib.request
 import re
-
-target = "http://m.pressian.com/m/m_article.html?no=138940"
-
 
 class GetPage:
     def __init__(self, target):
@@ -13,10 +11,11 @@ class GetPage:
         htmlDocument = urllib.request.urlopen(target)
         self.soup = BeautifulSoup(htmlDocument, 'html.parser')
         self.writerList_ = list()
+        self.articleDict_ = dict()
 
     def GetWriter(self):
         # Get ResultSet
-        writer = self.soup.find_all(class_="head_writer_fullname")
+        writer = self.soup.findAll(class_ = "head_writer_fullname")
 
         # Prefare substract name
         pattern = re.compile('\S*\S')
@@ -26,6 +25,18 @@ class GetPage:
             self.writerList_.append(t)
         return self.writerList_
 
+#    def GetArticle(self):
+#        article = self.soup.findAll(class_ = "cnt_view news_body_area")
 
-k = GetPage(target)
-print(k.GetWriter())
+#        doc =
+
+
+class WordCount:
+    def __init__(self, corpus):
+        self.corpus = corpus
+
+
+
+# target = "http://m.pressian.com/m/m_article.html?no=138940"
+# k = GetPage(target)
+# print(k.GetWriter())
