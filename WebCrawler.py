@@ -2,38 +2,51 @@
 
 from bs4 import BeautifulSoup
 from konlpy.tag import Hannanum
+from collections import Counter
 import urllib.request
 import re
 
 class GetPage:
     def __init__(self, target):
-        self.target = target
-        doc = urllib.request.urlopen(target)
-        self.soup = BeautifulSoup(doc, 'html.parser')
+        request = urllib.request.urlopen(target)
+        self.rawDoc = request.read()
+        self.soup = BeautifulSoup(request, 'html.parser')
         self.writerList_ = list()
+        # self.title = str()
+        # self.date = str()
         self.paragraphList_ = list()
         # self.articleDict_ = dict()
 
-    def GetWriter(self):
+    @property
+    def Article(self):
+        # doc = self.soup.findAll(class_="smartOutput body_font")
+        # startPos = doc[0].find('>')
+        # endPos = doc[0].find('</')
+        # doc = doc[0][startPos:endPos]
+        return self.soup.findAll(class_="smartOutput body_font")
+
+    @property
+    def WriterList(self):
         # Get ResultSet
-        writer = self.soup.findAll(class_ = "head_writer_fullname")
+        corpus = self.soup.findAll(class_ = "head_writer_fullname")
+        result = corpus[0]
 
         # Prefare substract name
         pattern = re.compile('\S*\S')
 
         # Append writers to list
-        for i in writer:
+        for i in result:
             t = pattern.findall(i.getText())[0]
             self.writerList_.append(t)
 
         return self.writerList_
 
-#    def GetArticle(self):
-#        article = self.soup.findAll(class_ = "cnt_view news_body_area")
+    @property
+    def title(self):
+        return 0
 
-#        doc =
-
-    def GetParagraph(self):
+    @property
+    def ParagraphList(self):
         # Get ResultSet
         page = self.soup.find(class_="smartOutput body_font")
 
@@ -46,15 +59,27 @@ class GetPage:
 
         return self.paragraphList_
 
+def WordCount(corpus):
+    h = Hannanum()
+    nouns = h.nouns(corpus)
+    frequency = Counter(nouns)
+    return frequency
 
-class WordCount:
-    def __init__(self, corpus):
-        self.corpus = corpus
 
 
+if __name__ == '__main__':
 
-target = "http://m.pressian.com/m/m_article.html?no=138940"
-k = GetPage(target)
-# print(k.GetWriter())
+    target = "http://m.pressian.com/m/m_article.html?no=138940"
+    # target = "test.html"
 
-print(k.GetParagraph()[-3:-1])
+    k = GetPage(target)
+
+    print(k.WriterList)
+    # k.ParagraphList
+    print(k.Article)
+    print(type(k.Article))
+
+    # print(WordCount(k.soup.find(class_ = "smartOutput body_font")))
+
+    #for corpus in k.ParagraphList[0:3]:
+    #    print(WordCount(corpus))
